@@ -17,4 +17,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    from algo_naif_Etienne import *
+    test_multiprocessing()
+
