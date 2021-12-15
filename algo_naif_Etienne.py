@@ -62,9 +62,9 @@ def threading_naif(n_thread=2, nrow_big_matrix=2000, ncol_big_matrix=20, verbose
 
     time_start = time.time()
     # Split input for the threads
-    indexes = (nrow_big_matrix//n_thread)*np.arange(1, n_thread + 1)
+    indexes = (nrow_big_matrix//n_thread)*np.arange(1, n_thread)
     input_mat_list = np.vsplit(big_matrix, indexes)
-
+    assert len(input_mat_list) == n_thread
 
     # Allocate output
     output_mat_list = []
