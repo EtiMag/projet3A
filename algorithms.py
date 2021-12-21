@@ -20,12 +20,12 @@ def norms(M):
     return norms_array
 
 ## Mapper and reducer
-def DIMSUM_mapper(subM, gamma):
+def DIMSUM_mapper(subM):
     pairs = dict()
     for i in range(len(subM)):
         row = subM[i]
+        print(mp.current_process(),i)
         for j in range(len(row)):
-            print(j)
             for k in range(len(row)):
                 if random.randint(0,1) >= min(1, gamma/(norms_array[j]*norms_array[k])):
                     if (j,k) in pairs:
@@ -34,7 +34,7 @@ def DIMSUM_mapper(subM, gamma):
                         pairs[(j,k)] = row[j]*row[k]    
     return pairs
 
-def DIMSUM_reducer(i,j, outputs, gamma):
+def DIMSUM_reducer(i,j, outputs):
     elem = 0
     for dictionnary in outputs:
         elem += dictionnary[i,j]
@@ -43,28 +43,32 @@ def DIMSUM_reducer(i,j, outputs, gamma):
 
 
 ## Create the matrix
-n = 10000
+n = 1000000
 m = 100
-
+gamma = 1
 
 A = np.random.rand(n,m)
 norms_array = norms(A)
 
-pool = Pool(mp.cpu_count())
-data_chunks = chunkify(A, mp.cpu_count())
+
+if __name__ == '__main__':
+    pool = Pool(mp.cpu_count())
+    data_chunks = chunkify(A, mp.cpu_count())
 
 
-## Map
-import time
-start_time = time.time()
-mapped = pool.map(DIMSUM_mapper, data_chunks)
+    ## Map
+    import time
+    start_time = time.time()
+    print(mp.cpu_count())
+    mapped = pool.map(DIMSUM_mapper, data_chunks)
 
 
 
-## Reduce
-M = np.zeros([m,m])
-for i in range(m):
-    for j in range(m):
-        M[i,j] = DIMSUM_reducer(i,j,mapped)
-print(M)
-print('With pool:', time.time()-start_time,'seconds to execute')   
+
+    ## Reduce
+    M = np.zeros([m,m])
+    for i in range(m):
+        for j in range(m):
+            M[i,j] = DIMSUM_reducer(i,j,mapped)
+    print(M)
+    print('With pool:', time.time()-start_time,'seconds to execute')   
