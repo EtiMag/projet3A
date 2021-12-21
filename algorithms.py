@@ -25,6 +25,7 @@ def DIMSUM_mapper(subM, gamma):
     for i in range(len(subM)):
         row = subM[i]
         for j in range(len(row)):
+            print(j)
             for k in range(len(row)):
                 if random.randint(0,1) >= min(1, gamma/(norms_array[j]*norms_array[k])):
                     if (j,k) in pairs:
@@ -42,10 +43,29 @@ def DIMSUM_reducer(i,j, outputs, gamma):
 
 
 ## Create the matrix
-n = 80
-m = 10
+n = 10000
+m = 100
 
 
 A = np.random.rand(n,m)
 norms_array = norms(A)
 
+pool = Pool(mp.cpu_count())
+data_chunks = chunkify(A, mp.cpu_count())
+
+if __name__ == '__main__':
+    ## Map
+    import time
+    start_time = time.time()
+    print(mp.cpu_count())
+    mapped = pool.map(DIMSUM_mapper, data_chunks)
+
+
+
+    ## Reduce
+    M = np.zeros([m,m])
+    for i in range(m):
+        for j in range(m):
+            M[i,j] = DIMSUM_reducer(i,j,mapped)
+    print(M)
+    print('With pool:', time.time()-start_time,'seconds to execute')   
