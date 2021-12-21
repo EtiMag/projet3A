@@ -1,8 +1,16 @@
+import os
+
+os.environ['MKL_NUM_THREADS'] = '1'
+np.__config__.show()
+
 from multiprocessing import Pool
 import multiprocessing as mp
 import numpy as np
 import random
 from math import sqrt
+import numpy as np
+
+
 
 ## Chunks
 def chunkify(M,R):
@@ -43,7 +51,7 @@ def DIMSUM_reducer(i,j, outputs):
 
 
 ## Create the matrix
-n = 1000000
+n = 100000
 m = 100
 gamma = 1
 

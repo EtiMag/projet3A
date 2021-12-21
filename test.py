@@ -1,1 +1,5 @@
-print("This is a test file")
+import numpy as np
+import os
+
+os.environ['MKL_NUM_THREADS'] = '1'
+np.__config__.show()
