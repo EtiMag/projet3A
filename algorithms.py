@@ -53,19 +53,18 @@ norms_array = norms(A)
 pool = Pool(mp.cpu_count())
 data_chunks = chunkify(A, mp.cpu_count())
 
-if __name__ == '__main__':
-    ## Map
-    import time
-    start_time = time.time()
-    print(mp.cpu_count())
-    mapped = pool.map(DIMSUM_mapper, data_chunks)
+
+## Map
+import time
+start_time = time.time()
+mapped = pool.map(DIMSUM_mapper, data_chunks)
 
 
 
-    ## Reduce
-    M = np.zeros([m,m])
-    for i in range(m):
-        for j in range(m):
-            M[i,j] = DIMSUM_reducer(i,j,mapped)
-    print(M)
-    print('With pool:', time.time()-start_time,'seconds to execute')   
+## Reduce
+M = np.zeros([m,m])
+for i in range(m):
+    for j in range(m):
+        M[i,j] = DIMSUM_reducer(i,j,mapped)
+print(M)
+print('With pool:', time.time()-start_time,'seconds to execute')   
