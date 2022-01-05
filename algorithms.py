@@ -1,16 +1,13 @@
 import os
-
-os.environ['MKL_NUM_THREADS'] = '1'
-np.__config__.show()
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+os.environ["OMP_NUM_THREADS"] = "1"
+import numpy as np
 
 from multiprocessing import Pool
 import multiprocessing as mp
-import numpy as np
 import random
 from math import sqrt
-import numpy as np
-
-
 
 ## Chunks
 def chunkify(M,R):
@@ -49,7 +46,6 @@ def DIMSUM_reducer(i,j, outputs):
     return (1/(min(gamma,(norms_array[i]*norms_array[j]))))*elem
 
 
-
 ## Create the matrix
 n = 100000
 m = 100
@@ -60,18 +56,15 @@ norms_array = norms(A)
 
 
 if __name__ == '__main__':
-    pool = Pool(mp.cpu_count())
-    data_chunks = chunkify(A, mp.cpu_count())
-
+    nb_process = 4
+    pool = Pool(nb_process)
+    data_chunks = chunkify(A, nb_process)
 
     ## Map
     import time
     start_time = time.time()
     print(mp.cpu_count())
     mapped = pool.map(DIMSUM_mapper, data_chunks)
-
-
-
 
     ## Reduce
     M = np.zeros([m,m])
@@ -80,3 +73,7 @@ if __name__ == '__main__':
             M[i,j] = DIMSUM_reducer(i,j,mapped)
     print(M)
     print('With pool:', time.time()-start_time,'seconds to execute')   
+
+
+
+    # Afficher le PID
