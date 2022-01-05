@@ -1,14 +1,13 @@
 import os
-
-os.environ['MKL_NUM_THREADS'] = '1'
-np.__config__.show()
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+os.environ["OMP_NUM_THREADS"] = "1"
+import numpy as np
 
 from multiprocessing import Pool
 import multiprocessing as mp
-import numpy as np
 import random
 from math import sqrt
-import numpy as np
 
 
 
