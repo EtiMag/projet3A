@@ -1,6 +1,7 @@
 from multiprocessing import pool
 import threading
 import time
+import numpy as np
 
 
 def test_multiprocessing():

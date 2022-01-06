@@ -9,6 +9,6 @@ if __name__ == "__main__":
     #test_multiprocessing()
     #test_threading()
 
-    threading_naif(n_thread = 6, nrow_big_matrix=4000, ncol_big_matrix=20)
+    threading_naif(n_thread = 3, nrow_big_matrix=70000000, ncol_big_matrix=20)
 
 
