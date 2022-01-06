@@ -29,10 +29,11 @@ def DIMSUM_mapper(subM):
     pairs = dict()
     for i in range(len(subM)):
         row = subM[i]
-        print(mp.current_process(),i)
+        if i == 0:
+            print('process id:',os.getpid())
         for j in range(len(row)):
             for k in range(len(row)):
-                if random.randint(0,1) >= min(1, gamma/(norms_array[j]*norms_array[k])):
+                if random.randint(0,1) >= min(1, gamma/(norms_array[j]*norms_array[k])): #same as naive algorithm + proba
                     if (j,k) in pairs:
                         pairs[(j,k)] += row[j]*row[k]
                     else:
@@ -56,7 +57,7 @@ norms_array = norms(A)
 
 
 if __name__ == '__main__':
-    nb_process = 4
+    nb_process = 8
     pool = Pool(nb_process)
     data_chunks = chunkify(A, nb_process)
 
@@ -76,4 +77,4 @@ if __name__ == '__main__':
 
 
 
-    # Afficher le PID
+# Afficher le PID
