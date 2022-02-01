@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def mapper(mat):
+def mapper(mat, norms_array):
     return mat.T@mat
 
 

@@ -13,7 +13,7 @@ import tools
 
 if __name__ == "__main__":
     # create big matrix (input)
-    nrow_big_matrix, ncol_big_matrix = int(1e7), 50
+    nrow_big_matrix, ncol_big_matrix = int(1e6), 50
     big_matrix = tools.create_big_matrix(nrow_big_matrix=nrow_big_matrix, ncol_big_matrix=ncol_big_matrix)
 
     # execute algorithm
@@ -21,7 +21,7 @@ if __name__ == "__main__":
                                           mapper=naive.mapper,
                                           reducer=naive.reducer,
                                           type="T",
-                                          n_split=6)
+                                          n_split=2)
 
     # check result shape
     assert result_parallel.shape == (ncol_big_matrix, ncol_big_matrix)
@@ -32,6 +32,6 @@ if __name__ == "__main__":
     # compare with basic approach
     result_basic, exec_time_basic = tools.time_basic(big_matrix)
     print("Execution time basic=", exec_time_basic)
-    print("Max diff", tools.max_diff(result_basic, result_parallel))
+    print("Max absolute diff between results", tools.max_diff(result_basic, result_parallel))
 
 
