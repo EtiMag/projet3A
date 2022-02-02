@@ -10,7 +10,7 @@ import threading as th
 import time
 
 
-def execute(big_matrix, mapper, reducer, type = "T", n_split = 6):
+def execute(big_matrix, mapper, reducer, type = "T", n_split = 6, gamma = 1):
     """Execute map - reduce algorithm based on input mapper and reducer, using Threads / Processes depending on type,
     returns a tuple (result_matrix, execution_time)"""
     (nrow_big_matrix, ncol_big_matrix) = big_matrix.shape
@@ -27,13 +27,13 @@ def execute(big_matrix, mapper, reducer, type = "T", n_split = 6):
         # create list of arguments
         args_list = []
         for sub_mat in sub_matrix_list:
-            args_list.append((sub_mat, norms_array.copy()))
+            args_list.append((sub_mat, norms_array.copy(), gamma))
 
         start_time = time.time()
         # map
         mapped = pool.starmap(mapper, args_list)
         # reduce
-        result = reducer(mapped)
+        result = reducer(mapped, norms_array, gamma)
         end_time = time.time()
         return result, end_time - start_time
 
@@ -46,13 +46,13 @@ def execute(big_matrix, mapper, reducer, type = "T", n_split = 6):
         start_time = time.time()
 
         # define thread content
-        def thread_content(mapper, sub_matrix, sub_output, norms_array):
+        def thread_content(mapper, sub_matrix, sub_output, norms_array, gamma):
             """Calls the mapper on the sub_matrix and copies the values in sub_output"""
-            sub_output[:, :] = mapper(sub_matrix, norms_array)
+            sub_output[:, :] = mapper(sub_matrix, norms_array, gamma)
 
         # start threads
         for i in range(n_split):
-            args = (mapper, sub_matrix_list[i], sub_output_list[i], norms_array.copy())
+            args = (mapper, sub_matrix_list[i], sub_output_list[i], norms_array.copy(), gamma)
             thread_current = th.Thread(target=thread_content, args=args)
             thread_current.start()
             thread_list.append(thread_current)
@@ -61,7 +61,7 @@ def execute(big_matrix, mapper, reducer, type = "T", n_split = 6):
             thread.join()
 
         # reduce
-        result = reducer(sub_output_list)
+        result = reducer(sub_output_list, norms_array, gamma)
         end_time = time.time()
         return result, end_time - start_time
 
