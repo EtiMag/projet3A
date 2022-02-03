@@ -7,6 +7,7 @@ os.environ["OMP_NUM_THREADS"] = "1"
 import numpy as np
 import time
 from scipy.stats import unitary_group
+import random
 
 
 def chunkify(Mat, n_split):
