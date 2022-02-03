@@ -35,3 +35,13 @@ def time_basic(big_matrix):
 def max_diff(matrix1, matrix2):
     """Returns the maximum absolute difference between matrix1 and matrix2 (Linf distance)"""
     return np.max(np.absolute(matrix1 - matrix2))
+
+
+#Recall that in finite dimension, all norms are equivalent
+def distance(mat1, mat2, norm = None):
+    # return the distance between 2 matrix using different norms:
+    # norm = 
+        # 'fro' for the Froebenius norm
+        # 'nuc' for the nuclear norm
+        #  inf  for the spectral norm
+    return np.linalg.norm(mat1-mat2,ord = norm)
