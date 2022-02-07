@@ -13,8 +13,8 @@ import tools
 
 if __name__ == "__main__":
     # create big matrix (input)
-    nrow_big_matrix, ncol_big_matrix = int(1e5), 50
-    big_matrix = tools.create_big_matrix(nrow_big_matrix=nrow_big_matrix, ncol_big_matrix=ncol_big_matrix)
+    nrow_big_matrix, ncol_big_matrix = int(1e3), 50
+    big_matrix = tools.create_big_matrix(nrow_big_matrix=nrow_big_matrix, ncol_big_matrix=ncol_big_matrix, rank = 10)
 
     # execute algorithm
     # result_parallel, exec_time_parallel = execution.execute(big_matrix=big_matrix,
@@ -22,12 +22,14 @@ if __name__ == "__main__":
     #                                       reducer=naive.reducer,
     #                                       type="T",
     #                                       n_split=2)
+    print(big_matrix)
     gamma=1
     result_parallel, exec_time_parallel = execution.execute(big_matrix=big_matrix,
-                                                            mapper=final.MapperWrapper(gamma),
-                                                            reducer=final.ReducerMapper(gamma),
-                                                            type="P",
-                                                            n_split=6)
+                                                            mapper=naive.mapper,
+                                                            reducer=naive.reducer,
+                                                            type="T",
+                                                            n_split=6,
+                                                            gamma=gamma)
 
     # check result shape
     assert result_parallel.shape == (ncol_big_matrix, ncol_big_matrix)

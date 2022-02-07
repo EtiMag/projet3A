@@ -20,12 +20,13 @@ def chunkify(Mat, n_split):
 
 
 # Create a sparse matrix
-def create_big_matrix(nrow_big_matrix, ncol_big_matrix, rank):
+def create_big_matrix(nrow_big_matrix, ncol_big_matrix, rank, verbose=True):
+    if verbose:
+        print("Creating big matrix")
     # Generate 2 random unitary matrix
     u, v = unitary_group.rvs(nrow_big_matrix), unitary_group.rvs(ncol_big_matrix)
     
     U, V = np.dot(u, u.conj().T), np.dot(v, v.conj().T)
-    
 
     n = min(ncol_big_matrix,nrow_big_matrix)
 
@@ -36,6 +37,8 @@ def create_big_matrix(nrow_big_matrix, ncol_big_matrix, rank):
         D[elem,elem] = 1
     
     # Return the singular value decomposition of the big matrix
+    if verbose:
+        print("Creating big matrix [OK]")
     return U.dot(D.dot(V))
 
 
