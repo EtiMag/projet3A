@@ -40,13 +40,15 @@ def create_big_matrix(nrow_big_matrix, ncol_big_matrix, rank, verbose=True, thre
     if verbose:
         print("Creating big matrix [OK]")
     A = U.dot(D.dot(V))
-    return A[np.abs(A) >= threshold]
+    A[np.abs(A) <= threshold] = 0
+    A.dtype = 'float64'
+    return A
 
 
 
 def time_basic(big_matrix):
     start_time = time.time()
-    result = big_matrix.T@big_matrix
+    result = big_matrix.T.dot(big_matrix)
     end_time = time.time()
     return result, end_time - start_time
 
