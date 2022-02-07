@@ -27,7 +27,8 @@ def execute(big_matrix, mapper, reducer, type = "T", n_split = 6, gamma = 1):
         # create list of arguments
         args_list = []
         for sub_mat in sub_matrix_list:
-            args_list.append((sub_mat, norms_array.copy(), gamma))
+            gamma_copy = gamma + 0.
+            args_list.append((sub_mat, norms_array.copy(), gamma_copy))
 
         start_time = time.time()
         # map
@@ -52,7 +53,8 @@ def execute(big_matrix, mapper, reducer, type = "T", n_split = 6, gamma = 1):
 
         # start threads
         for i in range(n_split):
-            args = (mapper, sub_matrix_list[i], sub_output_list[i], norms_array.copy(), gamma)
+            gamma_copy = gamma + 0. # necessary in order to copy the gamma value to avoid GIL
+            args = (mapper, sub_matrix_list[i], sub_output_list[i], norms_array.copy(), gamma_copy)
             thread_current = th.Thread(target=thread_content, args=args)
             thread_current.start()
             thread_list.append(thread_current)
