@@ -6,8 +6,8 @@ os.environ["NUMEXPR_NUM_THREADS"] = "1"
 os.environ["OMP_NUM_THREADS"] = "1"
 import numpy as np
 import time
-from scipy.stats import unitary_group
 import random
+import tqdm
 
 
 def chunkify(Mat, n_split):
@@ -19,41 +19,24 @@ def chunkify(Mat, n_split):
     return Mat_list
 
 
-# Create a sparse matrix
-def create_big_matrix(nrow_big_matrix, ncol_big_matrix, rank, verbose=True, threshold = 1e-16):
-    if verbose:
-        print("Creating big matrix")
-    # Generate 2 random unitary matrix
-    u, v = unitary_group.rvs(nrow_big_matrix), unitary_group.rvs(ncol_big_matrix)
-    
-    U, V = np.dot(u, u.conj().T), np.dot(v, v.conj().T)
-
-    n = min(ncol_big_matrix,nrow_big_matrix)
-
-    # Then generate a diagonal matrix (singular values) with the same rank as the big matrix
-    D = np.zeros((nrow_big_matrix, ncol_big_matrix))
-    non_zeros = random.sample([i for i in range(n)], rank)
-    for elem in non_zeros:
-        D[elem,elem] = 1
-    
-    # Return the singular value decomposition of the big matrix
-    if verbose:
-        print("Creating big matrix [OK]")
-    A = U.dot(D.dot(V))
-    A[np.abs(A) <= threshold] = 0
-    A.dtype = 'float64'
+# create a sparse matrix
+def create_big_matrix(nrow_big_matrix, ncol_big_matrix, nonzero):
+    assert ncol_big_matrix >= nonzero
+    A = np.zeros((nrow_big_matrix, ncol_big_matrix))
+    for i in tqdm.tqdm(range(nrow_big_matrix)):
+        nonzero_index = random.sample(list(range(ncol_big_matrix)), k=nonzero)
+        values = np.random.rand(nonzero)
+        A[i, nonzero_index] = values
     return A
-
-
 
 def time_basic(big_matrix):
     start_time = time.time()
-    result = big_matrix.T.dot(big_matrix)
+    result = big_matrix.T@big_matrix
     end_time = time.time()
     return result, end_time - start_time
 
 
-### We use several norms
+### Define several norms
 
 #Recall that in finite dimension, all norms are equivalent
 def max_diff(matrix1, matrix2):

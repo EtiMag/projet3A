@@ -10,6 +10,8 @@ import threading as th
 import time
 
 
+### Main execution procedure, taking the matrix, mapper and reducer as input
+
 def execute(big_matrix, mapper, reducer, type = "T", n_split = 6, gamma = 1):
     """Execute map - reduce algorithm based on input mapper and reducer, using Threads / Processes depending on type,
     returns a tuple (result_matrix, execution_time)"""
