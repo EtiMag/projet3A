@@ -20,7 +20,7 @@ def chunkify(Mat, n_split):
 
 
 # Create a sparse matrix
-def create_big_matrix(nrow_big_matrix, ncol_big_matrix, rank, verbose=True):
+def create_big_matrix(nrow_big_matrix, ncol_big_matrix, rank, verbose=True, threshold = 1e-16):
     if verbose:
         print("Creating big matrix")
     # Generate 2 random unitary matrix
@@ -39,7 +39,9 @@ def create_big_matrix(nrow_big_matrix, ncol_big_matrix, rank, verbose=True):
     # Return the singular value decomposition of the big matrix
     if verbose:
         print("Creating big matrix [OK]")
-    return U.dot(D.dot(V))
+    A = U.dot(D.dot(V))
+    return A[np.abs(A) >= threshold]
+
 
 
 def time_basic(big_matrix):
@@ -47,8 +49,6 @@ def time_basic(big_matrix):
     result = big_matrix.T@big_matrix
     end_time = time.time()
     return result, end_time - start_time
-
-
 
 
 ### We use several norms
