@@ -18,8 +18,8 @@ if __name__ == "__main__":
     ### first test
 
     # create big matrix (input)
-    nrow_big_matrix, ncol_big_matrix = int(1e5), 50
-    big_matrix = tools.create_big_matrix(nrow_big_matrix=nrow_big_matrix, ncol_big_matrix=ncol_big_matrix, nonzero=3)
+    nrow_big_matrix, ncol_big_matrix = int(1e3), 50
+    big_matrix = tools.create_big_matrix(nrow_big_matrix=nrow_big_matrix, ncol_big_matrix=ncol_big_matrix, nonzero=5)
 
     # check rank
     print("Big matrix size =", big_matrix.shape)
@@ -28,9 +28,10 @@ if __name__ == "__main__":
     gamma = 1.
 
     result_parallel, exec_time_parallel = execution.execute(big_matrix=big_matrix,
-                                                            mapper=naive.mapper,
-                                                            reducer=naive.reducer,
-                                                            type="P",
+                                                            mapper=final.mapper_python,
+                                                            reducer=final.reducer_python,
+                                                            python_or_np="python",
+                                                            type="T",
                                                             n_split=6,
                                                             gamma=gamma)
 
@@ -44,10 +45,10 @@ if __name__ == "__main__":
 
     ## measure performance
 
-    # # generate list of big matrix
-    # list_nrow = 2 ** np.arange(10, 12, 1)
-    # list_ncol = list(500 * np.ones((len(list_nrow, )), dtype=int))  # always 500
-    # list_nonzero = list(20 * np.ones((len(list_ncol, )), dtype=int))
+    # generate list of big matrix
+    # list_nrow = 2 ** np.arange(10, 21, 1)
+    # list_ncol = list(50 * np.ones((len(list_nrow, )), dtype=int))  # always 50
+    # list_nonzero = list(5 * np.ones((len(list_ncol, )), dtype=int))
     # list_matrix = []
     #
     # for nrow, ncol, nonzero in zip(list_nrow, list_ncol, list_nonzero):
@@ -56,12 +57,13 @@ if __name__ == "__main__":
     # pickle.dump(list_matrix, open("list_big_matrix.pickle", "wb"))
 
     # load list of big matrix
-    list_big_matrix = pickle.load(open("list_big_matrix.pickle", "rb"))
+    list_big_matrix = pickle.load(open("list_big_matrix_python.pickle", "rb"))
 
     performance_tests.perf_test_and_plot(list_big_matrix=list_big_matrix,
-                                         mapper_naive=naive.mapper,
-                                         reducer_naive=naive.reducer,
-                                         mapper_final=final.mapper,
-                                         reducer_final=final.reducer,
-                                         load=True)
+                                         mapper_naive=naive.mapper_python,
+                                         reducer_naive=naive.reducer_python,
+                                         mapper_final=final.mapper_python,
+                                         reducer_final=final.reducer_python,
+                                         python_or_np="python",
+                                         load=False)
 

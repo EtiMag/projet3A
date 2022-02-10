@@ -8,8 +8,11 @@ import numpy as np
 import pickle
 import matplotlib.pyplot as plt
 
+import execution
+import tools
 
-def perf_test_and_plot(list_big_matrix, mapper_naive, reducer_naive, mapper_final, reducer_final, load=True):
+
+def perf_test_and_plot(list_big_matrix, mapper_naive, reducer_naive, mapper_final, reducer_final, python_or_np, load=True):
     if load:
         list_of_list_time = pickle.load(open("times.pickle", "rb"))
         list_of_list_dist = pickle.load(open("dist.pickle", "rb"))
@@ -19,7 +22,8 @@ def perf_test_and_plot(list_big_matrix, mapper_naive, reducer_naive, mapper_fina
         list_time_naive_process = []
         list_time_final_thread = []
         list_time_final_process = []
-        list_time_basic = []
+        if python_or_np == "np":
+            list_time_basic = []
         list_dist_naive_thread = []
         list_dist_naive_process = []
         list_dist_final_thread = []
@@ -29,46 +33,53 @@ def perf_test_and_plot(list_big_matrix, mapper_naive, reducer_naive, mapper_fina
         for big_matrix in list_big_matrix:
             print("Handle big matrix shape", big_matrix.shape)
             result_naive_thread, time_naive_thread = execution.execute(big_matrix,
-                                                                       mapper=naive.mapper,
-                                                                       reducer=naive.reducer,
-                                                                       type="T",
-                                                                       n_split=n_split)
-            print("time_naive_thread=", time_naive_thread)
-            result_naive_process, time_naive_process = execution.execute(big_matrix,
-                                                                         mapper=naive.mapper,
-                                                                         reducer=naive.reducer,
-                                                                         type="P",
-                                                                         n_split=n_split)
-            print("time_naive_process=", time_naive_process)
-            result_final_thread, time_final_thread = execution.execute(big_matrix,
-                                                                       mapper=final.mapper,
-                                                                       reducer=final.reducer,
+                                                                       mapper=mapper_naive,
+                                                                       reducer=reducer_naive,
                                                                        type="T",
                                                                        n_split=n_split,
-                                                                       gamma=gamma)
-            print("time_final_thread=", time_final_thread)
-            result_final_process, time_final_process = execution.execute(big_matrix,
-                                                                         mapper=final.mapper,
-                                                                         reducer=final.reducer,
+                                                                       python_or_np=python_or_np)
+            print("time_naive_thread=", time_naive_thread)
+            result_naive_process, time_naive_process = execution.execute(big_matrix,
+                                                                         mapper=mapper_naive,
+                                                                         reducer=reducer_naive,
                                                                          type="P",
                                                                          n_split=n_split,
-                                                                         gamma=gamma)
+                                                                         python_or_np=python_or_np)
+            print("time_naive_process=", time_naive_process)
+            result_final_thread, time_final_thread = execution.execute(big_matrix,
+                                                                       mapper=mapper_final,
+                                                                       reducer=reducer_final,
+                                                                       type="T",
+                                                                       n_split=n_split,
+                                                                       gamma=gamma,
+                                                                       python_or_np=python_or_np)
+            print("time_final_thread=", time_final_thread)
+            result_final_process, time_final_process = execution.execute(big_matrix,
+                                                                         mapper=mapper_final,
+                                                                         reducer=reducer_final,
+                                                                         type="P",
+                                                                         n_split=n_split,
+                                                                         gamma=gamma,
+                                                                         python_or_np=python_or_np)
             print("time_final_process=", time_final_process)
-            result_basic, time_basic = tools.time_basic(big_matrix)
-            print("time_basic=", time_basic)
-            list_time_basic.append(time_basic)
+            if python_or_np == "np":
+                result_basic, time_basic = tools.time_basic(big_matrix)
+                print("time_basic=", time_basic)
+                list_time_basic.append(time_basic)
             list_time_naive_thread.append(time_naive_thread)
-            list_dist_naive_thread.append(tools.distance(result_naive_thread, result_basic, norm=float("Inf")))
+            list_dist_naive_thread.append(0)
             list_time_naive_process.append(time_naive_process)
-            list_dist_naive_process.append(tools.distance(result_naive_process, result_basic, norm=float("Inf")))
+            list_dist_naive_process.append(tools.distance(result_naive_process, result_naive_thread, norm=float("Inf")))
             list_time_final_thread.append(time_final_thread)
-            list_dist_final_thread.append(tools.distance(result_final_thread, result_basic, norm=float("Inf")))
+            list_dist_final_thread.append(tools.distance(result_final_thread, result_naive_thread, norm=float("Inf")))
             list_time_final_process.append(time_final_process)
-            list_dist_final_process.append(tools.distance(result_final_process, result_basic, norm=float("Inf")))
+            list_dist_final_process.append(tools.distance(result_final_process, result_naive_thread, norm=float("Inf")))
             print("Handle big matrix shape", big_matrix.shape, " [OK]")
 
         # save performance
-        list_of_list_time = [list_time_naive_thread, list_time_naive_process, list_time_final_thread, list_time_final_process, list_time_basic]
+        list_of_list_time = [list_time_naive_thread, list_time_naive_process, list_time_final_thread, list_time_final_process]
+        if python_or_np == "np":
+            list_of_list_time.append(list_time_basic)
         list_of_list_dist = [list_dist_naive_thread, list_dist_naive_process, list_dist_final_thread, list_dist_final_process]
 
         pickle.dump(list_of_list_time, open("times.pickle", "wb"))
@@ -81,7 +92,9 @@ def perf_test_and_plot(list_big_matrix, mapper_naive, reducer_naive, mapper_fina
 
     # plot times
     subplot = fig.add_subplot(1, 2, 1)
-    names_times = ["naive Thread", "naive Process", "final Thread", "final Process", "basic"]
+    names_times = ["naive Thread", "naive Process", "final Thread", "final Process"]
+    if python_or_np == "np":
+        names_times.append("basic")
 
     for list_of_times, name in zip(list_of_list_time, names_times):
         subplot.plot(list_nrow_log, list_of_times, label=name)
