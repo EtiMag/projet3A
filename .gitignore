@@ -134,3 +134,6 @@ dmypy.json
 .idea/projet3A.iml
 .idea/vcs.xml
 .idea/workspace.xml
+list_big_matrix.pickle
+list_big_matrix_np.pickle
+list_big_matrix_python.pickle
